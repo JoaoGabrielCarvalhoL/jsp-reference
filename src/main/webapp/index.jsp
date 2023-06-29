@@ -10,6 +10,7 @@
 	<h1>Sign In!</h1>
 
 	<form action="ServletLogin" method="post">
+		<input type="hidden" value="<%= request.getParameter("uri") %>" name="uri" />
 			
 		<label>Email</label>
 		<input name="email" type="email"/>

@@ -42,12 +42,20 @@ public class ServletLogin extends HttpServlet {
 		
 		String email = request.getParameter("email");
 		String password = request.getParameter("password");
+		String uri = request.getParameter("uri");
 		
 		if (email != null && !email.isBlank() && password != null && !password.isBlank()) {
 			LoginRequest loginRequest = new LoginRequest(email, password);
-			request.getSession().setAttribute("userCredentials", loginRequest);
-			RequestDispatcher redirect = request.getRequestDispatcher("pages/home.jsp");
+			
+			request.getSession().setAttribute("user", loginRequest);
+			
+			if (uri == null || uri.equals("null")) {
+				uri = "pages/home.jsp";
+			}
+			
+			RequestDispatcher redirect = request.getRequestDispatcher(uri);
 			redirect.forward(request, response);
+			
 		} else {
 			RequestDispatcher redirect = request.getRequestDispatcher("index.jsp");
 			request.setAttribute("message", "Invalid Email or Password!");
