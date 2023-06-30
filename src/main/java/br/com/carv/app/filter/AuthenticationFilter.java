@@ -2,7 +2,10 @@ package br.com.carv.app.filter;
 
 import java.io.IOException;
 import java.io.Serial;
+import java.sql.Connection;
+import java.sql.SQLException;
 
+import br.com.carv.app.connection.ConnectionFactory;
 import br.com.carv.app.payload.LoginRequest;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
@@ -24,6 +27,8 @@ public class AuthenticationFilter extends HttpFilter implements Filter {
 	
 	@Serial
 	private static final long serialVersionUID = 0L;
+	
+	private Connection connection;
        
     /**
      * @see HttpFilter#HttpFilter()
@@ -38,6 +43,12 @@ public class AuthenticationFilter extends HttpFilter implements Filter {
 	 */
 	public void destroy() {
 		// TODO Auto-generated method stub
+		try {
+			this.connection.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -67,6 +78,7 @@ public class AuthenticationFilter extends HttpFilter implements Filter {
 	 */
 	public void init(FilterConfig fConfig) throws ServletException {
 		// TODO Auto-generated method stub
+		this.connection = ConnectionFactory.getConnection();
 	}
 
 }

@@ -1,7 +1,9 @@
 package br.com.carv.app.servlet;
 
 import java.io.IOException;
+import java.sql.SQLException;
 
+import br.com.carv.app.dao.LoginDAO;
 import br.com.carv.app.payload.LoginRequest;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
@@ -14,6 +16,7 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class ServletLogin extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	private final LoginDAO loginDAO = new LoginDAO();
 
 	/**
 	 * @see HttpServlet#HttpServlet()
@@ -39,29 +42,38 @@ public class ServletLogin extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		
+
 		String email = request.getParameter("email");
 		String password = request.getParameter("password");
 		String uri = request.getParameter("uri");
-		
+
 		if (email != null && !email.isBlank() && password != null && !password.isBlank()) {
+
 			LoginRequest loginRequest = new LoginRequest(email, password);
-			
-			request.getSession().setAttribute("user", loginRequest);
-			
-			if (uri == null || uri.equals("null")) {
-				uri = "pages/home.jsp";
+
+			try {
+				if (loginDAO.authenticate(loginRequest)) {
+					request.getSession().setAttribute("user", loginRequest);
+
+					if (uri == null || uri.equals("null")) {
+						uri = "pages/home.jsp";
+					}
+					RequestDispatcher redirect = request.getRequestDispatcher(uri);
+					redirect.forward(request, response);
+
+				} else {
+					RequestDispatcher redirect = request.getRequestDispatcher("index.jsp");
+					request.setAttribute("message", "Invalid Email or Password!");
+					redirect.forward(request, response);
+				}
+
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
-			
-			RequestDispatcher redirect = request.getRequestDispatcher(uri);
-			redirect.forward(request, response);
-			
-		} else {
-			RequestDispatcher redirect = request.getRequestDispatcher("index.jsp");
-			request.setAttribute("message", "Invalid Email or Password!");
-			redirect.forward(request, response);
+
 		}
-		
+
 	}
 
 }
